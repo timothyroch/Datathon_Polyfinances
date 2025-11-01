@@ -1,0 +1,7 @@
+[
+  { "ticker": "AAPL", "name": "Apple Inc.", "sector": "Technology", "shares": 50, "price": 180 },
+  { "ticker": "MSFT", "name": "Microsoft Corp.", "sector": "Technology", "shares": 30, "price": 320 },
+  { "ticker": "NVDA", "name": "NVIDIA Corp.", "sector": "Semiconductors", "shares": 20, "price": 450 },
+  { "ticker": "TSLA", "name": "Tesla Inc.", "sector": "Automotive", "shares": 10, "price": 250 },
+  { "ticker": "AMZN", "name": "Amazon.com Inc.", "sector": "Consumer Discretionary", "shares": 15, "price": 130 }
+]
