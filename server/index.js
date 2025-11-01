@@ -6,42 +6,39 @@ const app = express();
 app.use(cors());
 const PORT = 4000;
 
-// ✅ RapidAPI Yahoo Finance key (yours)
-const RAPIDAPI_KEY = "86b2ab80c1msheec1b33946450f9p170a2cjsnf6df14fea82c";
+const FINNHUB_API_KEY = "d435rb9r01qvk0jab6tgd435rb9r01qvk0jab6u0";
 
 app.get("/api/quote", async (req, res) => {
-  const symbols = req.query.symbols || "AAPL,MSFT,GOOGL,TSLA,NVDA";
+  const symbols = (req.query.symbols || "AAPL,MSFT,GOOGL,TSLA,NVDA").split(",");
 
   try {
-    // ✅ First, try Yahoo Finance (newer endpoint)
-    const yahooUrl = `https://yahoo-finance15.p.rapidapi.com/api/yahoo/qu/quote/${symbols}`;
-    const yahooResponse = await fetch(yahooUrl, {
-      headers: {
-        "X-RapidAPI-Key": RAPIDAPI_KEY,
-        "X-RapidAPI-Host": "yahoo-finance15.p.rapidapi.com",
-      },
-    });
+    const results = await Promise.all(
+      symbols.map(async (symbol) => {
+        const url = `https://finnhub.io/api/v1/quote?symbol=${symbol}&token=${FINNHUB_API_KEY}`;
+        const r = await fetch(url);
 
-    if (yahooResponse.ok) {
-      const yahooData = await yahooResponse.json();
-      return res.json(yahooData);
-    } else {
-      console.warn("Yahoo failed:", yahooResponse.status, yahooResponse.statusText);
-    }
+        if (!r.ok) {
+          const text = await r.text();
+          throw new Error(`Finnhub request failed (${r.status}): ${text}`);
+        }
 
-    // ✅ Fallback: use FinancialModelingPrep (free, no key needed for demo)
-    const fmpUrl = `https://financialmodelingprep.com/api/v3/quote/${symbols}?apikey=demo`;
-    const fmpResponse = await fetch(fmpUrl);
-    const fmpData = await fmpResponse.json();
+        const d = await r.json();
+        return {
+          symbol,
+          regularMarketPrice: d.c,
+          regularMarketChangePercent:
+            d.pc && d.c ? ((d.c - d.pc) / d.pc) * 100 : null,
+        };
+      })
+    );
 
-    // match the Yahoo response shape for your frontend
-    res.json({ quoteResponse: { result: fmpData } });
+    res.json({ quoteResponse: { result: results } });
   } catch (err) {
-    console.error("Fetch error:", err.message);
+    console.error("Finnhub fetch error:", err);
     res.status(500).json({ error: err.message });
   }
 });
 
 app.listen(PORT, () =>
-  console.log(`✅ Server running on http://localhost:${PORT}`)
+  console.log(`Server running on http://localhost:${PORT}`)
 );
