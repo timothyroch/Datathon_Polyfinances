@@ -2,6 +2,7 @@ import { useState } from "react"
 import { askAI } from "../api/aiClient"
 import { usePortfolioStore } from "../store/portfolioStore"
 import type { AIResponse } from "../types"
+import FileUpload from "./FileUpload"
 
 export default function ChatBox({ onAI }: { onAI: (resp: AIResponse) => void }) {
   const [message, setMessage] = useState("")
@@ -30,14 +31,11 @@ export default function ChatBox({ onAI }: { onAI: (resp: AIResponse) => void }) 
       <h2 className="text-lg font-semibold mb-3">Chat with Indorex AI</h2>
 
       <div className="mb-2">
-        <input
-          type="file"
-          multiple
-          onChange={(e) => setFiles(Array.from(e.target.files || []))}
-          className="block w-full text-sm file:mr-3 file:px-3 file:py-1.5 file:rounded file:border-0 file:bg-white/10 file:text-white hover:file:bg-white/20"
-        />
+        <FileUpload onFilesUploaded={setFiles} />
         {files.length > 0 && (
-          <p className="text-xs text-white/60 mt-1">{files.length} document(s) attached</p>
+          <p className="text-xs text-white/60 mt-2">
+            {files.length} document(s) attached
+          </p>
         )}
       </div>
 
