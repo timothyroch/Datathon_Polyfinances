@@ -4,8 +4,6 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Progress } from "@/components/ui/progress"
-
-// Import the user's current holdings (ensure tsconfig has "resolveJsonModule": true)
 import portfolio from "@/data/portfolio.json"
 
 type FileItem = {
@@ -15,9 +13,9 @@ type FileItem = {
   status: "pending" | "uploading" | "done"
 }
 
-const API_URL =
-  import.meta.env.VITE_API_URL ||
-  "https://1pixxoj603.execute-api.us-east-1.amazonaws.com/prod/"
+// ---- Hardcoded local LLM (Ollama) config ----
+const OLLAMA_URL = "http://localhost:11434/api/chat"
+const OLLAMA_MODEL = "llama3"
 
 export default function Ingestion() {
   const [files, setFiles] = useState<FileItem[]>([])
@@ -40,14 +38,43 @@ export default function Ingestion() {
     setFiles((prev) => prev.filter((f) => f.id !== id))
   }
 
+  async function callOllama(message: string) {
+    const res = await fetch(OLLAMA_URL, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        model: OLLAMA_MODEL,
+        messages: [
+          {
+            role: "system",
+            content:
+              "You are a financial analysis assistant. Be concise, structured, and practical.",
+          },
+          { role: "user", content: message },
+        ],
+        stream: false,
+      }),
+    })
+
+    if (!res.ok) {
+      const text = await res.text().catch(() => "")
+      throw new Error(
+        `Ollama error ${res.status}: ${text || res.statusText}`
+      )
+    }
+    const data = await res.json()
+    // Non-streaming shape: { message: { role, content }, ... }
+    return data?.message?.content || JSON.stringify(data, null, 2)
+  }
+
   const handleSendToAI = async () => {
     setLoading(true)
     setResponse("")
     try {
-      // Build a compact payload: user context + current portfolio + file metadata
+      // Build compact payload: user context + current portfolio + file metadata
       const payload = {
         context,
-        portfolio, // comes from src/data/portfolio.json
+        portfolio, // from src/data/portfolio.json
         files: files.map((f) => ({
           name: f.file.name,
           type: f.file.type || "unknown",
@@ -57,34 +84,26 @@ export default function Ingestion() {
 
       // Compose a friendly analysis request
       const message = [
-        "You are a financial analysis assistant.",
-        "Analyze the user's current stock portfolio and any provided context.",
-        "Return a concise, structured assessment (exposure by sector, concentration risks, notable metrics, and a short summary).",
+        "Analyze the user's current stock portfolio and the notes below.",
+        "Return a concise, structured assessment:",
+        "- Sector exposure breakdown",
+        "- Concentration risks",
+        "- Notable metrics",
+        "- A short summary and advice",
         "",
         "Input JSON:",
         JSON.stringify(payload, null, 2),
       ].join("\n")
 
-      const res = await fetch(API_URL, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ message }),
-      })
-
-      // The GAAB proxy usually returns { answer, ... } — fall back to text if different
-      const data = await res.json().catch(() => ({} as any))
-      const answer =
-        (data && (data.answer || data.output || data.response)) ??
-        JSON.stringify(data, null, 2)
-
-      setResponse(answer || "No response from AI.")
+      const answer = await callOllama(message)
+      setResponse(answer || "No response from local LLM.")
     } catch (err: any) {
       console.error(err)
-      setResponse(
-        err?.message
-          ? `Error contacting AI: ${err.message}`
-          : "Error contacting AI."
-      )
+      const hint =
+        err?.message?.includes("Failed to fetch") || err?.message?.includes("CORS")
+          ? "\n\nHint: start Ollama with CORS allowed:\nOLLAMA_ORIGINS=http://localhost:5173 ollama serve"
+          : ""
+      setResponse(err?.message ? `Error: ${err.message}${hint}` : "Error contacting local LLM.")
     } finally {
       setLoading(false)
     }
@@ -105,8 +124,7 @@ export default function Ingestion() {
               Data Ingestion & Upload
             </CardTitle>
             <p className="text-sm text-gray-500">
-              Upload CSV, JSON, or PDF documents to feed Indorex AI with new
-              insights.
+              Upload CSV, JSON, or PDF documents to feed Indorex AI with new insights.
             </p>
           </CardHeader>
 
@@ -117,12 +135,8 @@ export default function Ingestion() {
               className="border-2 border-dashed border-gray-300 rounded-xl flex flex-col items-center justify-center py-16 cursor-pointer hover:border-blue-400 transition"
             >
               <UploadCloud size={36} className="text-blue-500 mb-3" />
-              <span className="text-gray-700 font-medium">
-                Click or drag files here
-              </span>
-              <span className="text-sm text-gray-400">
-                Supported: .csv, .json, .pdf
-              </span>
+              <span className="text-gray-700 font-medium">Click or drag files here</span>
+              <span className="text-sm text-gray-400">Supported: .csv, .json, .pdf</span>
               <Input
                 id="fileInput"
                 type="file"
@@ -143,12 +157,9 @@ export default function Ingestion() {
                     <div className="flex items-center gap-3">
                       <FileText className="text-gray-400" size={20} />
                       <div>
-                        <p className="text-sm font-medium text-gray-800">
-                          {file.name}
-                        </p>
+                        <p className="text-sm font-medium text-gray-800">{file.name}</p>
                         <p className="text-xs text-gray-500">
-                          {(file.size / 1024).toFixed(1)} KB •{" "}
-                          {file.type || "unknown"}
+                          {(file.size / 1024).toFixed(1)} KB • {file.type || "unknown"}
                         </p>
                       </div>
                     </div>
@@ -157,9 +168,7 @@ export default function Ingestion() {
                       {status === "uploading" ? (
                         <Loader2 className="animate-spin text-blue-500" size={18} />
                       ) : status === "done" ? (
-                        <span className="text-green-600 text-xs font-medium">
-                          Uploaded
-                        </span>
+                        <span className="text-green-600 text-xs font-medium">Uploaded</span>
                       ) : null}
                       <Button
                         variant="ghost"
@@ -179,9 +188,7 @@ export default function Ingestion() {
             {files.some((f) => f.status === "uploading") && (
               <div className="pt-2">
                 <Progress value={averageProgress} className="h-2" />
-                <p className="text-xs text-gray-500 mt-1">
-                  Uploading... {averageProgress}%
-                </p>
+                <p className="text-xs text-gray-500 mt-1">Uploading... {averageProgress}%</p>
               </div>
             )}
           </CardContent>
@@ -207,16 +214,14 @@ export default function Ingestion() {
                 onClick={handleSendToAI}
                 disabled={loading}
               >
-                {loading ? "Analyzing..." : "Send to AI"}
+                {loading ? "Analyzing..." : "Send to Local LLM"}
               </Button>
             </div>
 
             {response && (
               <div className="mt-6 p-4 border border-gray-200 rounded-lg bg-white shadow-sm text-gray-800">
                 <p className="font-medium">AI Response</p>
-                <pre className="mt-2 whitespace-pre-wrap text-sm">
-                  {response}
-                </pre>
+                <pre className="mt-2 whitespace-pre-wrap text-sm">{response}</pre>
               </div>
             )}
           </CardContent>
