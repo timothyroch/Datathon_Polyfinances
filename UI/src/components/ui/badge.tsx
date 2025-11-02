@@ -1,36 +1,29 @@
 import * as React from "react"
-import { cva, type VariantProps } from "class-variance-authority"
-
 import { cn } from "@/lib/utils"
+import ShadcnBadge, { type BadgeProps as ShadcnBadgeProps } from "@/components/ui/badge"
 
-const badgeVariants = cva(
-  "inline-flex items-center rounded-md border px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2",
-  {
-    variants: {
-      variant: {
-        default:
-          "border-transparent bg-primary text-primary-foreground shadow hover:bg-primary/80",
-        secondary:
-          "border-transparent bg-secondary text-secondary-foreground hover:bg-secondary/80",
-        destructive:
-          "border-transparent bg-destructive text-destructive-foreground shadow hover:bg-destructive/80",
-        outline: "text-foreground",
-      },
-    },
-    defaultVariants: {
-      variant: "default",
-    },
-  }
-)
+export type Tone = "zinc" | "green" | "red" | "amber" | "indigo" | "blue"
 
-export interface BadgeProps
-  extends React.HTMLAttributes<HTMLDivElement>,
-    VariantProps<typeof badgeVariants> {}
+const toneCls: Record<Tone, string> = {
+  zinc:   "bg-zinc-100 text-zinc-700 dark:bg-zinc-800 dark:text-zinc-200",
+  green:  "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-300",
+  red:    "bg-red-100 text-red-700 dark:bg-red-900/40 dark:text-red-300",
+  amber:  "bg-amber-100 text-amber-700 dark:bg-amber-900/40 dark:text-amber-300",
+  indigo: "bg-indigo-100 text-indigo-700 dark:bg-indigo-900/40 dark:text-indigo-300",
+  blue:   "bg-blue-100 text-blue-700 dark:bg-blue-900/40 dark:text-blue-300",
+}
 
-function Badge({ className, variant, ...props }: BadgeProps) {
+type Props = Omit<ShadcnBadgeProps, "variant"> & { tone?: Tone }
+
+export function ToneBadge({ tone = "zinc", className, ...props }: Props) {
+  // on utilise le variant "outline" du Badge shadcn, puis on applique nos couleurs tonales
   return (
-    <div className={cn(badgeVariants({ variant }), className)} {...props} />
+    <ShadcnBadge
+      variant="outline"
+      className={cn("rounded-full px-2 py-0.5", toneCls[tone], className)}
+      {...props}
+    />
   )
 }
 
-export { Badge, badgeVariants }
+export default ToneBadge

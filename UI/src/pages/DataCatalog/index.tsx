@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from "react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import { Badge } from "@/components/ui/badge"
+import { ToneBadge } from "@/components/ui/badge"
 import { Input } from "@/components/ui/input"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Skeleton } from "@/components/ui/skeleton"
@@ -174,16 +174,16 @@ export default function DataCatalog() {
           <div className="flex items-center justify-between flex-wrap gap-3">
             <div className="flex items-center gap-3">
               <CardTitle className="text-xl">Market Snapshot</CardTitle>
-              <Badge variant="secondary">{symbols.length} symbols</Badge>
+              <ToneBadge variant="secondary">{symbols.length} symbols</ToneBadge>
               {avgChange !== null && (
-                <Badge className={avgChange >= 0 ? "bg-emerald-100 text-emerald-800" : "bg-rose-100 text-rose-800"}>
+                <ToneBadge className={avgChange >= 0 ? "bg-emerald-100 text-emerald-800" : "bg-rose-100 text-rose-800"}>
                   {avgChange >= 0 ? (
                     <TrendingUp size={14} className="mr-1" />
                   ) : (
                     <TrendingDown size={14} className="mr-1" />
                   )}
                   Avg {avgChange.toFixed(2)}%
-                </Badge>
+                </ToneBadge>
               )}
             </div>
             <div className="flex items-center gap-2">
@@ -227,7 +227,7 @@ export default function DataCatalog() {
                         >
                           <div className="flex items-center justify-between">
                             <span className="font-medium">{h.displaySymbol || h.symbol}</span>
-                            <Badge variant="outline">{h.symbol}</Badge>
+                            <ToneBadge variant="outline">{h.symbol}</ToneBadge>
                           </div>
                           <div className="text-xs text-gray-500 truncate">{h.description}</div>
                         </button>
@@ -271,9 +271,9 @@ export default function DataCatalog() {
                     {topGainer.c != null ? `$${nf.format(topGainer.c)}` : "—"}
                   </div>
                 </div>
-                <Badge className="bg-emerald-100 text-emerald-800">
+                <ToneBadge className="bg-emerald-100 text-emerald-800">
                   +{(topGainer.dp ?? 0).toFixed(2)}%
-                </Badge>
+                </ToneBadge>
               </div>
             ) : (
               <div className="text-sm text-gray-500">No data</div>
@@ -301,9 +301,9 @@ export default function DataCatalog() {
                     {topLoser.c != null ? `$${nf.format(topLoser.c)}` : "—"}
                   </div>
                 </div>
-                <Badge className="bg-rose-100 text-rose-800">
+                <ToneBadge className="bg-rose-100 text-rose-800">
                   {(topLoser.dp ?? 0).toFixed(2)}%
-                </Badge>
+                </ToneBadge>
               </div>
             ) : (
               <div className="text-sm text-gray-500">No data</div>
@@ -335,7 +335,7 @@ export default function DataCatalog() {
                 >
                   <CardContent className="p-4">
                     <div className="flex items-center justify-between mb-2">
-                      <Badge variant="secondary">{r.symbol}</Badge>
+                      <ToneBadge variant="secondary">{r.symbol}</ToneBadge>
                       <Button
                         size="sm"
                         variant="ghost"
@@ -400,7 +400,7 @@ export default function DataCatalog() {
                     return (
                       <TableRow key={r.symbol} className="hover:bg-gray-50">
                         <TableCell>
-                          <Badge variant="outline">{r.symbol}</Badge>
+                          <ToneBadge variant="outline">{r.symbol}</ToneBadge>
                         </TableCell>
                         <TableCell className="text-right">
                           {r.c != null ? `$${nf.format(r.c)}` : "—"}
