@@ -1,0 +1,17 @@
+Symbol,Company,Sector,Quantity,AvgCost,CurrentPrice,MarketValue,CostBasis,UnrealizedPnL,BuyDate,RiskBucket,Weight
+MSFT,Microsoft Corporation,Software,177,172.91,229.33,40591.41,30605.07,9986.34,2020-12-02,Medium,0.14882
+LLY,Eli Lilly and Company,Pharmaceuticals,145,176.87,199.85,28978.25,25646.15,3332.1,2023-12-14,Low,0.106242
+TSM,Taiwan Semiconductor Mfg.,Semiconductors,120,244.01,231.81,27817.2,29281.2,-1464.0,2022-06-14,Medium,0.101986
+GOOG,Alphabet Inc. (Class C),Internet Services,171,194.82,153.34,26221.14,33314.22,-7093.08,2023-09-23,Medium,0.096134
+XOM,Exxon Mobil,Energy,150,157.34,173.44,26016.0,23601.0,2415.0,2024-09-08,Low,0.095382
+NFLX,"Netflix, Inc.",Entertainment,194,169.28,131.85,25578.9,32840.32,-7261.42,2021-07-30,Medium,0.093779
+AAPL,Apple Inc.,Consumer Electronics,170,177.03,150.36,25561.2,30095.1,-4533.9,2020-11-30,Medium,0.093715
+COST,Costco Wholesale,Consumer Staples,74,167.31,172.3,12750.2,12380.94,369.26,2021-05-19,Low,0.046746
+V,Visa Inc.,Financial Services,120,75.89,105.49,12658.8,9106.8,3552.0,2024-05-27,Medium,0.046411
+ORCL,Oracle Corporation,Software,125,97.14,93.22,11652.5,12142.5,-490.0,2021-05-07,Medium,0.042721
+META,"Meta Platforms, Inc.",Interactive Media,133,52.75,73.34,9754.22,7015.75,2738.47,2022-01-07,High,0.035762
+BRK.B,Berkshire Hathaway Inc.,Diversified Financials,84,107.26,115.33,9687.72,9009.84,677.88,2024-08-31,Medium,0.035518
+JPM,JPMorgan Chase & Co.,Banks,41,120.68,133.7,5481.7,4947.88,533.82,2024-12-30,Medium,0.020097
+GOOGL,Alphabet Inc. (Class A),Internet Services,78,82.99,68.2,5319.6,6473.22,-1153.62,2023-10-14,Medium,0.019503
+AVGO,Broadcom Inc.,Semiconductors,47,78.22,83.81,3939.07,3676.34,262.73,2023-03-06,Medium,0.014442
+TSLA,"Tesla, Inc.",Automobiles,7,98.3,106.86,748.02,688.1,59.92,2021-09-11,High,0.002742
