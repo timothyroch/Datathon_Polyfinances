@@ -92,7 +92,7 @@ export default function DataCatalog() {
   useEffect(() => {
     fetchAll()
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [symbols.join(",")])
+  }, [...symbols])
 
   // Live search (debounced)
   useEffect(() => {
