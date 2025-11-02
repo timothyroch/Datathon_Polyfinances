@@ -27,9 +27,7 @@ type SearchHit = {
   description?: string
 }
 
-// 🔑 For dev only – fine to keep here now.
-// Move to server/env for production.
-const FINNHUB_KEY = "d435rb9r01qvk0jab6tgd435rb9r01qvk0jab6u0"
+const FINNHUB_KEY = import.meta.env.VITE_FINNHUB_KEY
 
 export default function DataCatalog() {
   // Watchlist & quotes
